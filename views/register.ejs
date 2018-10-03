@@ -1,0 +1,11 @@
+<% include partials/header %>
+
+<form action = '/register' method = 'POST'>
+    <input type = 'text' name = 'username' placeholder = 'Логин' required>
+    <input type = 'password' name = 'password' placeholder = 'Пароль' required>
+    <label>Админ <input type = 'radio' name = 'isAdmin' value = 'true'></label>
+    <label>Пользователь <input type = 'radio' name = 'isAdmin' checked value = 'false'></label>
+    <input type = 'submit' value = 'Создать аккаунт'>
+</form>
+
+<% include partials/footer %>

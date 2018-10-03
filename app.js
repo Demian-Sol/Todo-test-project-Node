@@ -17,7 +17,7 @@ app.use( express.static(`${__dirname}/public`));
 app.use( methodOverride('_method'));
 
 app.use( require("express-session")({
-    secret: 'To do or not to do, that is a question',
+    secret: 'To do or not to do, that is the question',
     resave: false,
     saveUninitialized: false
 }));
@@ -42,6 +42,24 @@ app.get('/', (req, res) => {
 app.get('/todos', (req, res) => {
   res.render('index', {pagetitle: 'Show all todos'});
 })
+
+//Auth routes
+app.get('/register', (req, res) => {
+ res.render('register', {pagetitle: 'Create new account'});
+})
+
+app.post('/register', (req, res) => {
+  // console.log(req.body);
+  User.register(new User({username: req.body.username, isAdmin: req.body.isAdmin}), req.body.password, (err, user) => {
+    if (err) {
+      console.log(err);
+      res.redirect('back');
+    } else {
+      res.redirect('/todos');
+    }
+  })
+})
+
 
 app.listen(process.env.PORT, process.env.IP, (req, res) => {
   console.log('Ready to do todo');
