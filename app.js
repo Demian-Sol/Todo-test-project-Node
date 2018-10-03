@@ -33,6 +33,16 @@ app.use( (req, res, next) => {
   next();
 })
 
+app.get('/', (req, res) => {
+  res.render('home', {pagetitle: 'Allmax test todo app'});
+})
+
+//REST routes
+
+app.get('/todos', (req, res) => {
+  res.render('index', {pagetitle: 'Show all todos'});
+})
+
 app.listen(process.env.PORT, process.env.IP, (req, res) => {
   console.log('Ready to do todo');
 })
