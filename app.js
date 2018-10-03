@@ -39,7 +39,18 @@ app.get('/', (req, res) => {
 
 //REST routes
 
-app.get('/todos', (req, res) => {
+app.get('/todos', isLoggedIn, (req, res) => {
+  if (req.user.isAdmin) {
+    User.find( {}, (err, users) => {
+      if (err) {
+        console.log(err);
+        res.redirect('back');
+      } else {
+        console.log(users);
+        res.redirect('back')
+      }
+    })
+  }
   res.render('index', {pagetitle: 'Show all todos'});
 })
 
@@ -55,11 +66,34 @@ app.post('/register', (req, res) => {
       console.log(err);
       res.redirect('back');
     } else {
-      res.redirect('/todos');
+      passport.authenticate('local')(req, res, () => {
+        res.redirect('/todos');
+      });
     }
-  })
+  });
+});
+
+app.get('/login', (req, res) => {
+  res.render('login', {pagetitle: 'Enter using existing account'});
 })
 
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/todos',
+  failureRedirect: '/login'
+}), (req, res) => {})
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+})
+
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    res.redirect('/login');
+  }
+}
 
 app.listen(process.env.PORT, process.env.IP, (req, res) => {
   console.log('Ready to do todo');
