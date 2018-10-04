@@ -1,0 +1,16 @@
+<% include partials/header %>
+
+<form action = '/todos/<%= todo._id %>?_method=PUT' method = 'POST'>
+  <input type = 'text' value = '<%= todo.name %>' name = 'todo[name]'>
+  <label>Укажите приоритет:
+    <select name = 'todo[priority]'>
+        <option value = '1'>Низкий</option>
+        <option value = '2'>Средний</option>
+        <option value = '3'>Высокий</option>
+        <option value = '4'>Очень высокий</option>
+    </select>
+  </label>
+  <input type = 'submit' value = 'Изменить todo'>
+</form>
+
+<% include partials/footer %>
