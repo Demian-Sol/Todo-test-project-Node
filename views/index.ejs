@@ -1,0 +1,11 @@
+<% include partials/header %>
+
+<% userData.forEach( (user) => { %>
+  <h3><%= user.username %> todos:</h3>
+  <% user.todos.forEach( (todo) => { %>
+    <p><%= todo.name %></p>
+    <p>Приоритет: <%= todo.priority %></p>
+    <% }) %>
+<% }) %>
+
+<% include partials/footer %>

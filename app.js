@@ -41,17 +41,25 @@ app.get('/', (req, res) => {
 
 app.get('/todos', isLoggedIn, (req, res) => {
   if (req.user.isAdmin) {
-    User.find( {}, (err, users) => {
+    User.find( {} ).populate('todos').exec( (err, users) => {
       if (err) {
         console.log(err);
         res.redirect('back');
       } else {
-        console.log(users);
-        res.redirect('back')
+        res.render('index', {pagetitle: 'Show all todos', userData: users});
+      }
+    })
+  } else {
+    User.findById(req.user._id).populate('todos').exec( (err, user) => {
+      if (err) {
+        console.log(err);
+        res.redirect('back');
+      } else {
+        const userData = [user];
+        res.render('index', {pagetitle: 'Show all todos', userData: userData});
       }
     })
   }
-  res.render('index', {pagetitle: 'Show all todos'});
 })
 
 //Auth routes
@@ -90,9 +98,8 @@ app.get('/logout', (req, res) => {
 function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
-  } else {
-    res.redirect('/login');
   }
+    res.redirect('/login');
 }
 
 app.listen(process.env.PORT, process.env.IP, (req, res) => {

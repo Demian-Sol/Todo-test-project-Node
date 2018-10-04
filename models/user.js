@@ -3,7 +3,13 @@ const mongoose              = require("mongoose"),
       userSchema            = new mongoose.Schema({
           username: String,
           password: String,
-          isAdmin: Boolean
+          isAdmin: Boolean,
+          todos: [
+              {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Todo'
+              }
+          ]
       })
 
 userSchema.plugin(passportLocalMongoose);
