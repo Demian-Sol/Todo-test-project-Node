@@ -58,9 +58,30 @@ app.get('/todos', isLoggedIn, (req, res) => {
         const userData = [user];
         res.render('index', {pagetitle: 'Show all todos', userData: userData});
       }
-    })
+    });
   }
+});
+
+app.get('/todos/new', (req, res) => {
+  res.render('new', {pagetitle: 'Create todo'});
 })
+
+app.post('/todos', (req, res) => {
+  Todo.create(req.body.todo, (err, todo) => {
+    if (err) {
+      console.log(err);
+      res.redirect('back')
+    } else {
+      req.user.todos.push(todo);
+      req.user.save();
+      console.log(req.user);
+      res.redirect('/todos');
+    }
+  })
+})
+
+//show route is omited - nothing to elaborate
+
 
 //Auth routes
 app.get('/register', (req, res) => {
