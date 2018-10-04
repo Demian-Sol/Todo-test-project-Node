@@ -2,10 +2,19 @@
 
 <% userData.forEach( (user) => { %>
   <h3><%= user.username %> todos:</h3>
+  <%  %>
+    <a href = '/todos/new'>Добавить новый todo</a>
+  <%  %>
   <% user.todos.forEach( (todo) => { %>
     <p><%= todo.name %></p>
     <p>Приоритет: <%= todo.priority %></p>
-    <% }) %>
+    <% if (user.isAdmin === false) { %>
+      <a href = '/todos/<%= todo._id %>/edit'>Изменить</a>
+      <form action = '/todos/<%= todo._id %>?_method=DELETE' method = 'POST'>
+        <input type = 'submit' value = 'Удалить'>
+      </form>
+    <% } %>
+  <% }) %>
 <% }) %>
 
 <% include partials/footer %>

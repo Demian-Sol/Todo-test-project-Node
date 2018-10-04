@@ -8,8 +8,9 @@ const express        = require("express"),
       Todo           = require("./models/todo"),
       User           = require("./models/user");
       
-mongoose.connect('mongodb://localhost:27017/allmax-todo-project-db', {useNewUrlParser: true});
+mongoose.connect('mongodb://localhost:27017/allmax', {useNewUrlParser: true});
 mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 
 app.set('view engine', 'ejs');
 app.use( bodyParser.urlencoded({extended: true}) );
@@ -55,8 +56,8 @@ app.get('/todos', isLoggedIn, (req, res) => {
         console.log(err);
         res.redirect('back');
       } else {
-        const userData = [user];
-        res.render('index', {pagetitle: 'Show all todos', userData: userData});
+        console.log(user);
+        res.render('index', {pagetitle: 'Show all todos', userData: [user]});
       }
     });
   }
@@ -67,21 +68,62 @@ app.get('/todos/new', (req, res) => {
 })
 
 app.post('/todos', (req, res) => {
-  Todo.create(req.body.todo, (err, todo) => {
+  User.findById(req.user._id, (err, user) => {
+    if (err) {
+      console.log(err);
+    } else {
+      Todo.create({name: req.body.todo.name, priority: req.body.todo.priority}, (err, newTodo) => {
     if (err) {
       console.log(err);
       res.redirect('back')
     } else {
-      req.user.todos.push(todo);
-      req.user.save();
+      console.log(newTodo);
+      newTodo.save();
+      user.todos.push(newTodo);
+      user.save();
       console.log(req.user);
       res.redirect('/todos');
+    }
+  })
     }
   })
 })
 
 //show route is omited - nothing to elaborate
 
+app.get('/todos/:id/edit', (req, res) => {
+  Todo.findById(req.params.id, (err, todo) => {
+    if (err) {
+      console.log(err);
+      res.redirect('back')
+    } else {
+      res.render('edit', {pagetitle: 'Change existing todo', todo: todo});
+    }
+  });
+})
+
+app.put('/todos/:id', (req, res) => {
+  const todoUpd = req.body.todo;
+  Todo.findOneAndUpdate({_id: req.params.id}, {$set: {_id: req.params.id, name: todoUpd.name, priority: todoUpd.priority}}, (err) => {
+    if (err) {
+      console.log(err);
+      res.redirect('back');
+    } else {
+      res.redirect('/todos');
+    }
+  });
+})
+
+app.delete('/todos/:id', (req, res) => {
+  Todo.deleteOne({_id: req.params.id}, (err) => {
+    if (err) {
+      console.log(err);
+      res.redirect('back');
+    } else {
+      res.redirect('/todos');
+    }
+  });
+})
 
 //Auth routes
 app.get('/register', (req, res) => {
