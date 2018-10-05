@@ -81,7 +81,7 @@ app.post('/todos', (req, res) => {
       newTodo.save();
       user.todos.push(newTodo);
       user.save();
-      console.log(req.user);
+      console.log(user);
       res.redirect('/todos');
     }
   })
