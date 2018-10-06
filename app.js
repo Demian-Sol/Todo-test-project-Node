@@ -9,7 +9,6 @@ const express        = require("express"),
       User           = require("./models/user");
       
 mongoose.connect('mongodb://localhost:27017/allmax', {useNewUrlParser: true});
-mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 
 app.set('view engine', 'ejs');
@@ -30,7 +29,7 @@ passport.serializeUser( User.serializeUser() );
 passport.deserializeUser( User.deserializeUser() );
 
 app.use( (req, res, next) => {
-  res.locals.currentUser = req.currentUser;
+  res.locals.currentUser = req.user;
   next();
 })
 
@@ -41,23 +40,34 @@ app.get('/', (req, res) => {
 //REST routes
 
 app.get('/todos', isLoggedIn, (req, res) => {
+  const match = {};
+
+  if (req.query.priority !== undefined && req.query.priority !== '') {
+    match.priority = req.query.priority;
+  }
+  
+  if (req.query.isDone !== undefined && req.query.isDone !== '') {
+    match.isDone = req.query.isDone;
+  }
+  
   if (req.user.isAdmin) {
-    User.find( {} ).populate('todos').exec( (err, users) => {
+    User.find( {} ).populate({path: 'todos', match: match}).exec( (err, users) => {
       if (err) {
         console.log(err);
         res.redirect('back');
       } else {
-        res.render('index', {pagetitle: 'Show all todos', userData: users});
+        res.render('index', {pagetitle: 'Show all todos', userData: users, setPriority:setPriority, priority:req.query.priority, isDone: req.query.isDone});
       }
     })
   } else {
-    User.findById(req.user._id).populate('todos').exec( (err, user) => {
+    User.findById(req.user._id).populate({path: 'todos', match: match}).exec( (err, user) => {
       if (err) {
         console.log(err);
         res.redirect('back');
       } else {
         console.log(user);
-        res.render('index', {pagetitle: 'Show all todos', userData: [user]});
+        res.render('index',
+        {pagetitle: 'Show all todos', userData: [user], setPriority:setPriority, priority:req.query.priority, isDone: req.query.isDone});
       }
     });
   }
@@ -72,19 +82,16 @@ app.post('/todos', (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      Todo.create({name: req.body.todo.name, priority: req.body.todo.priority}, (err, newTodo) => {
-    if (err) {
-      console.log(err);
-      res.redirect('back')
-    } else {
-      console.log(newTodo);
-      newTodo.save();
-      user.todos.push(newTodo);
-      user.save();
-      console.log(user);
-      res.redirect('/todos');
-    }
-  })
+      Todo.create(req.body.todo, (err, newTodo) => {
+        if (err) {
+          console.log(err);
+          res.redirect('back')
+        } else {
+          user.todos.push(newTodo);
+          user.save();
+          res.redirect('/todos');
+        }
+      })
     }
   })
 })
@@ -149,13 +156,21 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', passport.authenticate('local', {
-  successRedirect: '/todos',
+  successRedirect: `/todos`, //`/todos?priority=3&isDone=false`,
   failureRedirect: '/login'
 }), (req, res) => {})
 
 app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/');
+})
+
+app.get('/isdone/:id/:state', (req, res) => {
+  Todo.updateOne(
+    { _id: req.params.id }, 
+    { $set: { isDone: req.params.state } },
+    function (err) { if (err) {console.log(err);} })
+    res.redirect(`/todos?priority=${req.query.priority}&isDone=${req.query.isDone}`)
 })
 
 function isLoggedIn(req, res, next) {
@@ -165,6 +180,14 @@ function isLoggedIn(req, res, next) {
     res.redirect('/login');
 }
 
-app.listen(process.env.PORT, process.env.IP, (req, res) => {
-  console.log('Ready to do todo');
+function setPriority(lvl) {
+  const priorities = ['Низкий', "Средний", "Высокий", "Очень высокий"];
+  return priorities[lvl];
+}
+
+const port = process.env.PORT || 3000;
+const ip = process.env.IP || '127.0.0.1';
+
+app.listen(port, ip, (req, res) => {
+   console.log(`Ready to do todo on IP ${ip} port ${port}`);
 })

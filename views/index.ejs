@@ -1,19 +1,36 @@
 <% include partials/header %>
-
+  <a href = '/todos/new'>Добавить новый todo</a>
+  <p>
+    Фильтр по приоритету: 
+    <a href = '/todos?priority=0&isDone=<%= isDone %>'>Низкий</a>
+    <a href = '/todos?priority=1&isDone=<%= isDone %>'>Средний</a>
+    <a href = '/todos?priority=2&isDone=<%= isDone %>'>Высокий</a>
+    <a href = '/todos?priority=3&isDone=<%= isDone %>'>Очень высокий</a>
+  </p>
+  <p>
+    Фильтр по статусу выполнения:
+    <a href = '/todos?priority=<%= priority %>'>Все</a>
+    <a href = '/todos?priority=<%= priority %>&isDone=false'>Невыполненные</a>
+    <a href = '/todos?priority=<%= priority %>&isDone=true'>Выполненные</a>
+  </p>
 <% userData.forEach( (user) => { %>
   <h3><%= user.username %> todos:</h3>
-  <%  %>
-    <a href = '/todos/new'>Добавить новый todo</a>
-  <%  %>
+
   <% user.todos.forEach( (todo) => { %>
-    <p><%= todo.name %></p>
-    <p>Приоритет: <%= todo.priority %></p>
-    <% if (user.isAdmin === false) { %>
-      <a href = '/todos/<%= todo._id %>/edit'>Изменить</a>
-      <form action = '/todos/<%= todo._id %>?_method=DELETE' method = 'POST'>
-        <input type = 'submit' value = 'Удалить'>
-      </form>
-    <% } %>
+      <p><%= todo.name %></p>
+      <p>Приоритет: <%= setPriority(todo.priority) %></p>
+      
+      <% if (user._id.equals(currentUser._id)) { %>
+        <a href = '/todos/<%= todo._id %>/edit'>Изменить задачу</a>
+        <p>
+          Статус: 
+          <% if (todo.isDone) { %> Выполнено <% } else { %> Невыполнено <% } %>
+          <a href = '/isdone/<%= todo._id %>/<%= !todo.isDone %>?priority=<%= priority %>&isDone=<%= isDone %>'>Изменить статус</a>
+        </p>
+        <form action = '/todos/<%= todo._id %>?_method=DELETE' method = 'POST'>
+          <input type = 'submit' value = 'Удалить'>
+        </form>
+      <% } %>
   <% }) %>
 <% }) %>
 

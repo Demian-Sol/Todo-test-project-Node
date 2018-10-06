@@ -4,6 +4,8 @@
   "description": "test project made for Allmax team",
   "main": "app.js",
   "scripts": {
+    "seedDB": "node ./seeds/seedDB.js",
+    "app": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "dmitry-lys-dd",

@@ -1,10 +1,11 @@
 const mongoose              = require("mongoose"),
-      passportLocalMongoose = require("passport-local-mongoose"),
-      todo1Schema            = new mongoose.Schema({
+      todoSchema           = new mongoose.Schema({
           name: String,
-          priority: Number
+          priority: Number,
+          isDone: {
+            type: Boolean,
+            default: false
+          }
       })
 
-todo1Schema.plugin(passportLocalMongoose);
-
-module.exports = mongoose.model('Todo', todo1Schema);
+module.exports = mongoose.model('Todo', todoSchema);
