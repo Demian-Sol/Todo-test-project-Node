@@ -1,5 +1,5 @@
 Allmax team test todo project.\
-Note: The project only contains logic and no functionality\
+Note: The project only contains logic and no visual improvements\
 To run:\
 1. Install MongoDB\
 2. If needed, specify alternnate path for your Data directory and run mongod.exe(\
