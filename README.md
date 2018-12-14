@@ -1,4 +1,5 @@
 Allmax team test todo project.\
+Note: The project only contains logic and no functionality\
 To run:\
 1. Install MongoDB\
 2. If needed, specify alternnate path for your Data directory and run mongod.exe(\
@@ -10,3 +11,4 @@ From root directory:\
 To seed the database with data, run 'npm run seedDB'
 Script creates 4 accounts: user1, user2, admin1, admin2, all with 'password' password,\
 and assigns number of todos to each.
+
